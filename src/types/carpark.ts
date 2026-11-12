@@ -49,7 +49,7 @@ export interface Carpark {
   evCharging?: EVChargerInfo;
   rates: ParkingRate;
   lastUpdated: string;
-  source: 'live-api' | 'verified-cache';
+  source: 'lta-datamall' | 'live-api' | 'verified-cache';
 }
 
 export interface UserLocation {

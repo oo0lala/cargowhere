@@ -75,13 +75,17 @@ export default function App() {
     setFavorites(getSavedFavorites());
   }, []);
 
-  // Fetch real-time data from Data.gov.sg
+  const [sourceType, setSourceType] = useState<'lta-datamall' | 'data-gov-sg' | 'verified-cache'>('data-gov-sg');
+  const [isLtaKeyConfigured, setIsLtaKeyConfigured] = useState<boolean>(false);
+
+  // Fetch real-time data from LTA DataMall / Data.gov.sg
   const loadData = useCallback(async () => {
     setIsRefreshing(true);
     const result = await fetchLiveCarparkAvailability();
     setCarparks(result.carparks);
     setLastUpdated(result.timestamp);
-    setIsLiveApi(result.isLiveApi);
+    setSourceType(result.sourceType);
+    setIsLtaKeyConfigured(result.isLtaKeyConfigured);
     setIsRefreshing(false);
   }, []);
 
@@ -233,11 +237,22 @@ export default function App() {
             </button>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
             <Activity className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
             <span>
-              {isLiveApi ? 'Data.gov.sg API connected' : 'Verified Transport Feed'} · Synced at {lastUpdated}
+              {sourceType === 'lta-datamall'
+                ? 'LTA DataMall CarParkAvailabilityv2 connected'
+                : sourceType === 'data-gov-sg'
+                ? 'Data.gov.sg live feed active'
+                : 'Verified Transport Feed'}
+              {' · '}
+              Synced at {lastUpdated}
             </span>
+            {!isLtaKeyConfigured && (
+              <span className="hidden md:inline px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                /api/carparkavailability ready
+              </span>
+            )}
           </div>
         </div>
 
